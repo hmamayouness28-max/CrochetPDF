@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crochet Pattern PDF Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #2E86DE;
+            --primary-dark: #1B5FAA;
+            --accent: #F39C12;
+            --accent-hover: #E67E22;
+            --bg: #F0F4F8;
+            --card: #FFFFFF;
+            --text: #2C3E50;
+            --text-light: #7F8C8D;
+            --border: #E8EEF3;
+            --success: #27AE60;
+            --danger: #E74C3C;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ─── HEADER ─── */
+        .header {
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+            padding: 30px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(46,134,222,0.1) 0%, transparent 50%);
+            animation: pulse 8s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: white;
+            position: relative;
+        }
+        .header h1 span { color: var(--accent); }
+        .header p {
+            color: rgba(255,255,255,0.7);
+            margin-top: 8px;
+            font-size: 1rem;
+            position: relative;
+        }
+        .yarn-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+
+        /* ─── MAIN CONTAINER ─── */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* ─── API KEY SECTION ─── */
+        .api-section {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .api-section .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .api-section .section-title h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .api-section .section-title .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+        .api-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .api-row input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: 'Inter', monospace;
+            transition: border 0.3s;
+        }
+        .api-row input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .api-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .api-link:hover { text-decoration: underline; }
+        .api-status {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .api-status.connected { color: var(--success); }
+        .api-status.disconnected { color: var(--text-light); }
+
+        /* ─── FORM CARD ─── */
+        .form-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .form-card h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-card h2 .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* ─── FORM INPUTS ─── */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+        .form-group label .optional {
+            color: var(--text-light);
+            font-weight: 400;
+            font-size: 0.8rem;
+        }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(46,134,222,0.1);
+        }
+        .form-group input[type="text"]::placeholder {
+            color: #BDC3C7;
+        }
+
+        /* ─── FILE UPLOAD ─── */
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        @media (max-width: 600px) {
+            .upload-grid { grid-template-columns: 1fr; }
+        }
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #FAFBFC;
+        }
+        .upload-box:hover {
+            border-color: var(--primary);
+            background: rgba(46,134,222,0.03);
+        }
+        .upload-box.has-image {
+            border-color: var(--success);
+            border-style: solid;
+            background: rgba(39,174,96,0.03);
+        }
+        .upload-box input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+        }
+        .upload-box .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        .upload-box .upload-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+        .upload-box .upload-hint {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+        .upload-box .preview-img {
+            max-width: 100%;
+            max-height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .upload-box .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--danger);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ─── GENERATE BUTTON ─── */
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(46,134,222,0.3);
+        }
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(46,134,222,0.4);
+        }
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ─── PROGRESS ─── */
+        .progress-section {
+            display: none;
+            background: var(--card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+        .progress-section.active { display: block; }
+        .progress-bar-track {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .progress-status {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+        .progress-status .step-icon {
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ─── RESULT ─── */
+        .result-section {
+            display: none;
+            background: var(--card);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--success);
+            text-align: center;
+        }
+        .result-section.active { display: block; }
+        .result-section .success-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+        .result-section h3 {
+            font-size: 1.4rem;
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--success), #219A52);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(39,174,96,0.3);
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(39,174,96,0.4);
+        }
+        .new-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 10px 24px;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+        .new-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ─── ERROR ─── */
+        .error-section {
+            display: none;
+            background: #FEF0F0;
+            border: 2px solid var(--danger);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .error-section.active { display: block; }
+        .error-section h3 { color: var(--danger); margin-bottom: 8px; }
+        .error-section p { color: var(--text-light); font-size: 0.9rem; }
+
+        /* ─── HISTORY ─── */
+        .history-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .history-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .history-list { list-style: none; }
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            background: var(--bg);
+            transition: all 0.2s;
+        }
+        .history-item:hover { background: #E8EEF3; }
+        .history-item .info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .history-item .info .title { font-weight: 600; font-size: 0.9rem; }
+        .history-item .info .date { font-size: 0.75rem; color: var(--text-light); }
+        .history-item a {
+            padding: 6px 14px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .empty-history {
+            text-align: center;
+            color: var(--text-light);
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <span class="yarn-icon">🧶</span>
+        <h1>Crochet Pattern <span>PDF Generator</span></h1>
+        <p>Powered by Google Gemini AI — Generate professional patterns instantly</p>
+    </div>
+
+    <div class="container">
+
+        <!-- AI PROVIDER -->
+        <div class="api-section">
+            <div class="section-title">
+                <div class="icon">🤖</div>
+                <h3>AI Provider</h3>
+            </div>
+            <div style="display:flex;gap:12px;margin-bottom:16px;">
+                <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px 16px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.2s;background:var(--card);" id="providerGeminiLabel">
+                    <input type="radio" name="provider" value="gemini" id="providerGemini" checked onchange="switchProvider()">
+                    <span style="font-weight:600;">Gemini</span>
+                    <span style="font-size:0.8rem;color:var(--text-light);">Google AI</span>
+                </label>
+                <label style="flex:1;display:flex;align-items:center;gap:8px;padding:12px 16px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all 0.2s;background:var(--card);" id="providerMistralLabel">
+                    <input type="radio" name="provider" value="mistral" id="providerMistral" onchange="switchProvider()">
+                    <span style="font-weight:600;">Mistral</span>
+                    <span style="font-size:0.8rem;color:var(--text-light);">Mistral AI</span>
+                </label>
+            </div>
+            <!-- Gemini API Key -->
+            <div style="margin-bottom:14px;">
+                <div class="section-title">
+                    <div class="icon">🔑</div>
+                    <h3>Gemini API Key</h3>
+                </div>
+                <div class="api-row">
+                    <input type="password" id="geminiKey" placeholder="Paste Gemini API key..." oninput="saveApiKey('gemini')">
+                    <a href="https://aistudio.google.com/apikey" target="_blank" class="api-link">Get Key →</a>
+                </div>
+                <div class="api-status disconnected" id="geminiStatus">
+                    <span>●</span> Enter Gemini key
+                </div>
+            </div>
+
+            <!-- Mistral API Key -->
+            <div>
+                <div class="section-title">
+                    <div class="icon">🔑</div>
+                    <h3>Mistral API Key</h3>
+                </div>
+                <div class="api-row">
+                    <input type="password" id="mistralKey" placeholder="Paste Mistral API key..." oninput="saveApiKey('mistral')">
+                    <a href="https://console.mistral.ai/api-keys" target="_blank" class="api-link">Get Key →</a>
+                </div>
+                <div class="api-status disconnected" id="mistralStatus">
+                    <span>●</span> Enter Mistral key
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 1: TITLE + REFERENCE IMAGE -->
+        <div class="form-card">
+            <h2><span class="step-num">1</span> Pattern Title & Reference</h2>
+            <div class="form-group">
+                <label>What crochet pattern do you want to create?</label>
+                <input type="text" id="patternTitle" placeholder="e.g. Amigurumi Teddy Bear, Baby Blanket, Market Bag...">
+            </div>
+            <div style="margin-top:18px;padding:16px;background:#F8FAFC;border:2px dashed #E2E8F0;border-radius:14px;display:flex;align-items:center;gap:16px;cursor:pointer;" onclick="document.getElementById('refFile').click()" id="refBox">
+                <input type="file" id="refFile" accept="image/*" style="display:none;" onchange="handleRefUpload(this)">
+                <div id="refPreview" style="width:80px;height:80px;border-radius:12px;background:#E8EEF3;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+                    <span style="font-size:2rem;">📷</span>
+                </div>
+                <div>
+                    <div style="font-weight:700;font-size:1rem;color:var(--text);">Upload Reference Image</div>
+                    <div style="font-size:0.85rem;color:var(--text-light);margin-top:4px;">Upload a photo of the product you want to recreate. The AI will analyze it to generate a more accurate pattern with matching details.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 2: GENERATE PATTERN + IMAGE PROMPTS -->
+        <div class="form-card" id="promptsCard">
+            <h2><span class="step-num">2</span> Generate Pattern & Image Prompts</h2>
+            <p style="color:var(--text-light);margin-bottom:16px;font-size:0.95rem;">
+                AI will generate the pattern text, then show you an image prompt for <strong>each part</strong> (Head, Body, Arms...).
+                Copy each prompt to <a href="https://aitestkitchen.withgoogle.com/tools/image-fx" target="_blank" style="color:var(--primary);font-weight:600;">ImageFX</a>, generate images, and upload them below.
+            </p>
+            <button class="generate-btn" style="background:linear-gradient(135deg,#27AE60,#2ECC71);margin-bottom:20px;font-size:1rem;padding:14px 28px;" id="promptsBtn" onclick="generatePatternText()">
+                🤖 Generate Pattern + Prompts
+            </button>
+
+            <!-- Loading -->
+            <div id="textLoading" style="display:none;text-align:center;padding:20px;">
+                <div class="spinner"></div>
+                <p style="margin-top:10px;color:var(--text-light);">AI is writing your pattern... This may take 30-60 seconds.</p>
+            </div>
+
+            <!-- Per-part prompts + uploads will appear here -->
+            <div id="promptsContainer" style="display:none;">
+                <div id="promptsList"></div>
+            </div>
+        </div>
+
+        <!-- STEP 3: ETSY LISTING -->
+        <div class="form-card" id="etsyCard" style="display:none;">
+            <h2><span class="step-num">3</span> Etsy Listing — SEO Optimized</h2>
+            <p style="color:var(--text-light);margin-bottom:18px;font-size:0.95rem;">
+                Copy these to your Etsy listing for maximum visibility and sales.
+            </p>
+
+            <!-- SEO Title -->
+            <div style="margin-bottom:18px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <label style="font-weight:700;font-size:1rem;color:var(--text);">🏷️ SEO Title <span style="font-size:0.78rem;color:var(--text-light);font-weight:400;">(paste in Etsy title field)</span></label>
+                    <button onclick="copyField('etsyTitle')" style="background:var(--primary);color:white;border:none;padding:5px 14px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-weight:600;">Copy</button>
+                </div>
+                <textarea id="etsyTitle" style="width:100%;height:60px;border:2px solid #E2E8F0;border-radius:10px;padding:12px;font-size:0.9rem;color:#1A1A2E;background:#F8FAFC;resize:none;font-family:inherit;font-weight:600;" readonly></textarea>
+                <div style="text-align:right;margin-top:3px;"><span id="etsyTitleCount" style="font-size:0.75rem;color:var(--text-light);">0/140 characters</span></div>
+            </div>
+
+            <!-- Description -->
+            <div style="margin-bottom:18px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <label style="font-weight:700;font-size:1rem;color:var(--text);">📝 Product Description <span style="font-size:0.78rem;color:var(--text-light);font-weight:400;">(paste in Etsy description)</span></label>
+                    <button onclick="copyField('etsyDesc')" style="background:var(--primary);color:white;border:none;padding:5px 14px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-weight:600;">Copy</button>
+                </div>
+                <textarea id="etsyDesc" style="width:100%;height:280px;border:2px solid #E2E8F0;border-radius:10px;padding:12px;font-size:0.82rem;color:#2C3E50;background:#F8FAFC;resize:vertical;font-family:inherit;line-height:1.5;" readonly></textarea>
+            </div>
+
+            <!-- Tags -->
+            <div style="margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <label style="font-weight:700;font-size:1rem;color:var(--text);">🔖 Etsy Tags <span style="font-size:0.78rem;color:var(--text-light);font-weight:400;">(13 tags — paste one by one)</span></label>
+                    <button onclick="copyField('etsyTags')" style="background:var(--primary);color:white;border:none;padding:5px 14px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-weight:600;">Copy All</button>
+                </div>
+                <div id="etsyTagsContainer" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+                <textarea id="etsyTags" style="display:none;"></textarea>
+            </div>
+        </div>
+
+        <!-- PINTEREST SEO -->
+        <div class="form-card" id="pinterestCard" style="display:none;">
+            <h2 style="color:#E60023;"><span class="step-num" style="background:#E60023;">4</span> Pinterest SEO — Drive Traffic</h2>
+            <p style="color:var(--text-light);margin-bottom:18px;font-size:0.95rem;">
+                Optimize your Pinterest pins to drive traffic to your Etsy shop. Copy these for your pin.
+            </p>
+
+            <!-- Pinterest Title -->
+            <div style="margin-bottom:18px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <label style="font-weight:700;font-size:1rem;color:var(--text);">📌 Pin Title <span style="font-size:0.78rem;color:var(--text-light);font-weight:400;">(max 100 chars)</span></label>
+                    <button onclick="copyField('pinTitle')" style="background:#E60023;color:white;border:none;padding:5px 14px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-weight:600;">Copy</button>
+                </div>
+                <textarea id="pinTitle" style="width:100%;height:50px;border:2px solid #FECDD3;border-radius:10px;padding:12px;font-size:0.9rem;color:#1A1A2E;background:#FFF5F5;resize:none;font-family:inherit;font-weight:600;" readonly></textarea>
+                <div style="text-align:right;margin-top:3px;"><span id="pinTitleCount" style="font-size:0.75rem;color:var(--text-light);">0/100 characters</span></div>
+            </div>
+
+            <!-- Pinterest Description -->
+            <div style="margin-bottom:18px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <label style="font-weight:700;font-size:1rem;color:var(--text);">📝 Pin Description <span style="font-size:0.78rem;color:var(--text-light);font-weight:400;">(max 500 chars, with hashtags)</span></label>
+                    <button onclick="copyField('pinDesc')" style="background:#E60023;color:white;border:none;padding:5px 14px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-weight:600;">Copy</button>
+                </div>
+                <textarea id="pinDesc" style="width:100%;height:200px;border:2px solid #FECDD3;border-radius:10px;padding:12px;font-size:0.82rem;color:#2C3E50;background:#FFF5F5;resize:vertical;font-family:inherit;line-height:1.5;" readonly></textarea>
+                <div style="text-align:right;margin-top:3px;"><span id="pinDescCount" style="font-size:0.75rem;color:var(--text-light);">0/500 characters</span></div>
+            </div>
+
+            <!-- Pinterest Tags/Keywords -->
+            <div style="margin-bottom:18px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <label style="font-weight:700;font-size:1rem;color:var(--text);">🔖 Pinterest Keywords <span style="font-size:0.78rem;color:var(--text-light);font-weight:400;">(add to your pin description)</span></label>
+                    <button onclick="copyField('pinTags')" style="background:#E60023;color:white;border:none;padding:5px 14px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-weight:600;">Copy All</button>
+                </div>
+                <div id="pinTagsContainer" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+                <textarea id="pinTags" style="display:none;"></textarea>
+            </div>
+
+            <!-- Pinterest Categories -->
+            <div style="margin-bottom:10px;">
+                <div style="margin-bottom:8px;">
+                    <label style="font-weight:700;font-size:1rem;color:var(--text);">📂 Suggested Boards/Categories</label>
+                </div>
+                <div id="pinCategoriesContainer" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            </div>
+        </div>
+
+        <!-- GENERATE + CLEAR BUTTONS -->
+        <div style="display:flex;gap:12px;align-items:center;">
+            <button class="generate-btn" id="generateBtn" onclick="generatePDF()" style="flex:1;">
+                🚀 Generate Crochet Pattern PDF
+            </button>
+            <button onclick="clearForm()" style="background:#E74C3C;color:white;border:none;padding:18px 28px;border-radius:16px;font-size:1rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.2s;" onmouseover="this.style.background='#C0392B'" onmouseout="this.style.background='#E74C3C'">
+                🗑️ Clear
+            </button>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="progress-section" id="progressSection">
+            <div class="spinner"></div>
+            <h3 id="progressTitle">Generating your pattern...</h3>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <div class="progress-status" id="progressStatus">
+                <span class="step-icon">🤖</span> Sending to Gemini AI...
+            </div>
+        </div>
+
+        <!-- RESULT -->
+        <div class="result-section" id="resultSection">
+            <div class="success-icon">✅</div>
+            <h3>PDF Generated Successfully!</h3>
+            <p id="resultInfo"></p>
+            <a class="download-btn" id="downloadBtn" href="#" download>
+                📥 Download PDF
+            </a>
+            <br>
+            <button class="new-btn" onclick="resetForm()">+ Create Another Pattern</button>
+        </div>
+
+        <!-- ERROR -->
+        <div class="error-section" id="errorSection">
+            <h3>❌ Generation Failed</h3>
+            <p id="errorMessage"></p>
+            <button class="new-btn" onclick="resetForm()" style="margin-top:12px">Try Again</button>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="history-card" style="margin-top: 24px;">
+            <h3>📋 Recent Patterns</h3>
+            <ul class="history-list" id="historyList">
+                <li class="empty-history">No patterns generated yet. Create your first one above!</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        🧶 Crochet Pattern PDF Generator &copy; 2025 &bull; Powered by Google Gemini AI
+    </div>
+
+    <script>
+        // ─── Dual API Key handling + localStorage persistence ───
+        function saveApiKey(provider) {
+            const input = document.getElementById(provider + 'Key');
+            const status = document.getElementById(provider + 'Status');
+            const val = input.value.trim();
+            if (val.length > 10) {
+                status.className = 'api-status connected';
+                status.innerHTML = '<span>●</span> ' + provider.charAt(0).toUpperCase() + provider.slice(1) + ' key saved ✓';
+                localStorage.setItem('crochet_' + provider + '_key', val);
+            } else {
+                status.className = 'api-status disconnected';
+                status.innerHTML = '<span>●</span> Enter ' + provider.charAt(0).toUpperCase() + provider.slice(1) + ' key';
+                localStorage.removeItem('crochet_' + provider + '_key');
+            }
+        }
+
+        function getActiveApiKey() {
+            const provider = document.querySelector('input[name="provider"]:checked').value;
+            return document.getElementById(provider + 'Key').value.trim();
+        }
+
+        // Load saved keys on page load
+        ['gemini', 'mistral'].forEach(p => {
+            const saved = localStorage.getItem('crochet_' + p + '_key');
+            if (saved) {
+                document.getElementById(p + 'Key').value = saved;
+                saveApiKey(p);
+            }
+        });
+        const savedProvider = localStorage.getItem('crochet_provider');
+        if (savedProvider) {
+            const radio = document.querySelector(`input[name="provider"][value="${savedProvider}"]`);
+            if (radio) radio.checked = true;
+        }
+
+        // Save provider choice
+        document.querySelectorAll('input[name="provider"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                localStorage.setItem('crochet_provider', this.value);
+            });
+        });
+
+        // ─── File Upload ───
+        // ─── Clear / Reset Form ───
+        function clearForm() {
+            // Clear title
+            document.getElementById('patternTitle').value = '';
+            // Clear reference image
+            document.getElementById('refFile').value = '';
+            document.getElementById('refPreview').innerHTML = '<span style="font-size:2rem;">📷</span>';
+            const refBox = document.getElementById('refBox');
+            refBox.style.borderColor = ''; refBox.style.borderStyle = ''; refBox.style.background = '';
+            // Clear prompts section
+            document.getElementById('promptsContainer').style.display = 'none';
+            document.getElementById('promptsList').innerHTML = '';
+            document.getElementById('textLoading').style.display = 'none';
+            // Clear progress & results
+            document.getElementById('progressSection').classList.remove('active');
+            document.getElementById('resultSection').classList.remove('active');
+            document.getElementById('errorSection').classList.remove('active');
+            // Hide Etsy & Pinterest cards
+            document.getElementById('etsyCard').style.display = 'none';
+            document.getElementById('pinterestCard').style.display = 'none';
+            // Reset job
+            currentJobId = null;
+            // Re-enable button
+            document.getElementById('generateBtn').disabled = false;
+            document.getElementById('promptsBtn').disabled = false;
+        }
+
+        function handleRefUpload(input) {
+            const box = document.getElementById('refBox');
+            const preview = document.getElementById('refPreview');
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" style="width:80px;height:80px;object-fit:cover;border-radius:12px;">`;
+                    box.style.borderColor = 'var(--success)';
+                    box.style.borderStyle = 'solid';
+                    box.style.background = 'rgba(39,174,96,0.04)';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleUpload(input, boxId, previewId) {
+            const box = document.getElementById(boxId);
+            const preview = document.getElementById(previewId);
+            const file = input.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" class="preview-img" alt="Preview">
+                        <div class="upload-label" style="margin-top:6px">${file.name}</div>
+                    `;
+                    box.classList.add('has-image');
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-btn';
+                    removeBtn.innerHTML = '✕';
+                    removeBtn.onclick = function(ev) {
+                        ev.stopPropagation();
+                        input.value = '';
+                        const labels = {
+                            coverPreview: ['🖼️', 'Cover Image', 'Main project photo'],
+                            materialsPreview: ['🧵', 'Materials', 'Yarn & hooks photo'],
+                            closingPreview: ['✨', 'Closing Image', 'Final page photo'],
+                        };
+                        const [icon, label, hint] = labels[previewId];
+                        preview.innerHTML = `
+                            <div class="upload-icon">${icon}</div>
+                            <div class="upload-label">${label}</div>
+                            <div class="upload-hint">${hint}</div>
+                        `;
+                        box.classList.remove('has-image');
+                    };
+                    box.appendChild(removeBtn);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ─── Step 2: Generate Pattern Text + Per-Part Prompts ───
+        let currentJobId = null;
+
+        async function generatePatternText() {
+            const apiKey = getActiveApiKey();
+            const title = document.getElementById('patternTitle').value.trim();
+            const provider = document.querySelector('input[name="provider"]:checked').value;
+
+            if (!apiKey) { alert('Enter your ' + provider.charAt(0).toUpperCase() + provider.slice(1) + ' API key first!'); return; }
+            if (!title) { alert('Enter a pattern title!'); return; }
+
+            const btn = document.getElementById('promptsBtn');
+            btn.disabled = true;
+            document.getElementById('textLoading').style.display = 'block';
+            document.getElementById('promptsContainer').style.display = 'none';
+
+            try {
+                const formData = new FormData();
+                formData.append('api_key', apiKey);
+                formData.append('title', title);
+                formData.append('provider', provider);
+                const refFile = document.getElementById('refFile').files[0];
+                if (refFile) formData.append('reference', refFile);
+
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), 120000);
+                const response = await fetch('/generate_text', {
+                    method: 'POST', body: formData, signal: controller.signal
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    currentJobId = result.job_id;
+                    const container = document.getElementById('promptsContainer');
+                    const list = document.getElementById('promptsList');
+                    container.style.display = 'block';
+                    list.innerHTML = '';
+
+                    // Show detected colors banner
+                    if (result.detected_colors && result.has_reference) {
+                        const colorBanner = document.createElement('div');
+                        colorBanner.style.cssText = 'background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border:2px solid #66BB6A;border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;';
+                        colorBanner.innerHTML = `
+                            <span style="font-size:1.3rem;">🎨</span>
+                            <div>
+                                <div style="font-weight:700;font-size:0.9rem;color:#2E7D32;">Colors Detected from Reference Image</div>
+                                <div style="font-size:0.85rem;color:#33691E;margin-top:2px;">${result.detected_colors}</div>
+                            </div>
+                        `;
+                        list.appendChild(colorBanner);
+                    } else if (!result.has_reference) {
+                        const warnBanner = document.createElement('div');
+                        warnBanner.style.cssText = 'background:#FFF3E0;border:2px solid #FFB74D;border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;';
+                        warnBanner.innerHTML = `
+                            <span style="font-size:1.2rem;">⚠️</span>
+                            <div style="font-size:0.85rem;color:#E65100;">No reference image uploaded — colors are AI-guessed. Upload a photo in Step 1 for exact color matching!</div>
+                        `;
+                        list.appendChild(warnBanner);
+                    }
+
+                    const icons = { cover: '🖼️', closing: '✨', assembly: '🔧' };
+
+                    for (const pp of result.parts_prompts) {
+                        const icon = icons[pp.key] || '🧶';
+                        const card = document.createElement('div');
+                        card.style.cssText = 'background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:14px;margin-bottom:10px;';
+                        card.innerHTML = `
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                <span style="font-weight:700;font-size:0.95rem;">${icon} ${pp.name}</span>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <label style="background:var(--primary);color:white;padding:5px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-weight:600;">
+                                        Upload
+                                        <input type="file" accept="image/*" data-key="${pp.key}" onchange="handlePartUpload(this)" style="display:none;">
+                                    </label>
+                                    <button onclick="copyPrompt(this, 'prompt_${pp.key}')" style="background:#34495E;color:white;border:none;padding:5px 12px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-weight:600;">
+                                        Copy
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:10px;align-items:start;">
+                                <div id="img_preview_${pp.key}" style="width:70px;height:70px;border-radius:10px;background:#E8EEF3;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:1.5rem;">${icon}</div>
+                                <textarea id="prompt_${pp.key}" readonly style="flex:1;height:55px;border:1px solid #E2E8F0;border-radius:8px;padding:8px;font-size:0.78rem;color:#34495E;background:white;resize:none;font-family:inherit;">${pp.prompt}</textarea>
+                            </div>
+                        `;
+                        list.appendChild(card);
+                    }
+
+                    // ─── Populate Etsy Listing Fields ───
+                    if (result.etsy_title) {
+                        document.getElementById('etsyCard').style.display = 'block';
+
+                        // SEO Title
+                        const titleEl = document.getElementById('etsyTitle');
+                        titleEl.value = result.etsy_title;
+                        const charCount = result.etsy_title.length;
+                        const countEl = document.getElementById('etsyTitleCount');
+                        countEl.textContent = `${charCount}/140 characters`;
+                        countEl.style.color = charCount > 140 ? '#E74C3C' : charCount > 120 ? '#F39C12' : 'var(--text-light)';
+                        countEl.style.fontWeight = charCount > 140 ? '700' : '400';
+
+                        // Description
+                        document.getElementById('etsyDesc').value = result.etsy_description || '';
+
+                        // Tags as clickable chips
+                        const tagsContainer = document.getElementById('etsyTagsContainer');
+                        const tagsHidden = document.getElementById('etsyTags');
+                        tagsContainer.innerHTML = '';
+                        const tags = result.etsy_tags || [];
+                        tagsHidden.value = tags.join(', ');
+                        tags.forEach((tag, idx) => {
+                            const chip = document.createElement('span');
+                            chip.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:#EBF5FB;color:#2E86DE;padding:6px 14px;border-radius:20px;font-size:0.82rem;font-weight:600;cursor:pointer;border:1px solid #BEE0F7;transition:all 0.2s;';
+                            chip.textContent = tag;
+                            chip.title = 'Click to copy';
+                            chip.onclick = function() {
+                                navigator.clipboard.writeText(tag).then(() => {
+                                    chip.style.background = '#27AE60';
+                                    chip.style.color = 'white';
+                                    chip.style.borderColor = '#27AE60';
+                                    setTimeout(() => {
+                                        chip.style.background = '#EBF5FB';
+                                        chip.style.color = '#2E86DE';
+                                        chip.style.borderColor = '#BEE0F7';
+                                    }, 1000);
+                                });
+                            };
+                            tagsContainer.appendChild(chip);
+                        });
+                    }
+
+                    // ─── Populate Pinterest Fields ───
+                    if (result.pin_title) {
+                        document.getElementById('pinterestCard').style.display = 'block';
+
+                        // Pin Title
+                        const pinTitleEl = document.getElementById('pinTitle');
+                        pinTitleEl.value = result.pin_title;
+                        const pinTitleCount = result.pin_title.length;
+                        const pinTitleCountEl = document.getElementById('pinTitleCount');
+                        pinTitleCountEl.textContent = `${pinTitleCount}/100 characters`;
+                        pinTitleCountEl.style.color = pinTitleCount > 100 ? '#E74C3C' : 'var(--text-light)';
+
+                        // Pin Description
+                        const pinDescEl = document.getElementById('pinDesc');
+                        pinDescEl.value = result.pin_description || '';
+                        const pinDescCount = (result.pin_description || '').length;
+                        const pinDescCountEl = document.getElementById('pinDescCount');
+                        pinDescCountEl.textContent = `${pinDescCount}/500 characters`;
+                        pinDescCountEl.style.color = pinDescCount > 500 ? '#E74C3C' : 'var(--text-light)';
+
+                        // Pin Tags as red chips
+                        const pinTagsContainer = document.getElementById('pinTagsContainer');
+                        const pinTagsHidden = document.getElementById('pinTags');
+                        pinTagsContainer.innerHTML = '';
+                        const pinTags = result.pin_tags || [];
+                        pinTagsHidden.value = pinTags.join(', ');
+                        pinTags.forEach(tag => {
+                            const chip = document.createElement('span');
+                            chip.style.cssText = 'display:inline-flex;align-items:center;background:#FFF0F0;color:#E60023;padding:6px 14px;border-radius:20px;font-size:0.82rem;font-weight:600;cursor:pointer;border:1px solid #FECDD3;transition:all 0.2s;';
+                            chip.textContent = tag;
+                            chip.title = 'Click to copy';
+                            chip.onclick = function() {
+                                navigator.clipboard.writeText(tag).then(() => {
+                                    chip.style.background = '#E60023'; chip.style.color = 'white';
+                                    setTimeout(() => { chip.style.background = '#FFF0F0'; chip.style.color = '#E60023'; }, 1000);
+                                });
+                            };
+                            pinTagsContainer.appendChild(chip);
+                        });
+
+                        // Pin Categories as green chips
+                        const pinCatContainer = document.getElementById('pinCategoriesContainer');
+                        pinCatContainer.innerHTML = '';
+                        (result.pin_categories || []).forEach(cat => {
+                            const chip = document.createElement('span');
+                            chip.style.cssText = 'display:inline-flex;align-items:center;background:#F0FFF4;color:#27AE60;padding:6px 14px;border-radius:20px;font-size:0.82rem;font-weight:600;cursor:pointer;border:1px solid #C6F6D5;transition:all 0.2s;';
+                            chip.textContent = cat;
+                            chip.title = 'Click to copy';
+                            chip.onclick = function() {
+                                navigator.clipboard.writeText(cat).then(() => {
+                                    chip.style.background = '#27AE60'; chip.style.color = 'white';
+                                    setTimeout(() => { chip.style.background = '#F0FFF4'; chip.style.color = '#27AE60'; }, 1000);
+                                });
+                            };
+                            pinCatContainer.appendChild(chip);
+                        });
+                    }
+
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                let msg = err.name === 'AbortError' ? 'Timeout — try again.' : err.message;
+                alert('Error: ' + msg);
+            }
+
+            document.getElementById('textLoading').style.display = 'none';
+            btn.disabled = false;
+        }
+
+        function handlePartUpload(input) {
+            const key = input.dataset.key;
+            const file = input.files[0];
+            if (!file) return;
+            const preview = document.getElementById('img_preview_' + key);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" style="width:70px;height:70px;object-fit:cover;border-radius:10px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function copyPrompt(btn, textareaId) {
+            const textarea = document.getElementById(textareaId);
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                const orig = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = '#27AE60';
+                setTimeout(() => { btn.textContent = orig; btn.style.background = '#34495E'; }, 1500);
+            });
+        }
+
+        function copyField(fieldId) {
+            const el = document.getElementById(fieldId);
+            navigator.clipboard.writeText(el.value).then(() => {
+                const btn = el.parentElement.querySelector('button') || el.closest('div').querySelector('button');
+                if (btn) {
+                    const orig = btn.textContent;
+                    btn.textContent = '✅ Copied!';
+                    btn.style.background = '#27AE60';
+                    setTimeout(() => { btn.textContent = orig; btn.style.background = 'var(--primary)'; }, 1500);
+                }
+            });
+        }
+
+        // ─── Provider Switch ───
+        function switchProvider() {
+            const isMistral = document.getElementById('providerMistral').checked;
+            const geminiLabel = document.getElementById('providerGeminiLabel');
+            const mistralLabel = document.getElementById('providerMistralLabel');
+
+            if (isMistral) {
+                mistralLabel.style.borderColor = 'var(--primary)';
+                mistralLabel.style.background = '#EBF5FB';
+                geminiLabel.style.borderColor = 'var(--border)';
+                geminiLabel.style.background = 'var(--card)';
+            } else {
+                geminiLabel.style.borderColor = 'var(--primary)';
+                geminiLabel.style.background = '#EBF5FB';
+                mistralLabel.style.borderColor = 'var(--border)';
+                mistralLabel.style.background = 'var(--card)';
+            }
+            localStorage.setItem('crochet_provider', isMistral ? 'mistral' : 'gemini');
+        }
+        // Init provider UI
+        switchProvider();
+
+        // ─── Generate PDF ───
+        async function generatePDF() {
+            if (!currentJobId) {
+                alert('Please generate the pattern text first (Step 2)!');
+                return;
+            }
+
+            // Build form data with uploaded images
+            const formData = new FormData();
+            formData.append('job_id', currentJobId);
+
+            // Collect all per-part uploaded images
+            const fileInputs = document.querySelectorAll('#promptsList input[type="file"]');
+            for (const input of fileInputs) {
+                if (input.files[0]) {
+                    formData.append(input.dataset.key, input.files[0]);
+                }
+            }
+
+            // Show progress
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('progressSection').classList.add('active');
+            document.getElementById('resultSection').classList.remove('active');
+            document.getElementById('errorSection').classList.remove('active');
+
+            updateProgress(10, '🤖 Sending to Gemini AI...');
+
+            try {
+                // Simulate progress while waiting
+                let progressInterval = setInterval(() => {
+                    const bar = document.getElementById('progressBar');
+                    let current = parseFloat(bar.style.width) || 10;
+                    if (current < 85) {
+                        current += Math.random() * 5;
+                        bar.style.width = current + '%';
+                    }
+                }, 1000);
+
+                setTimeout(() => updateProgress(null, '📝 AI is writing your pattern...'), 3000);
+                setTimeout(() => updateProgress(null, '🎨 Creating PDF layout...'), 8000);
+                setTimeout(() => updateProgress(null, '📄 Building 8 pages...'), 15000);
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
+
+                const response = await fetch('/generate_pdf', {
+                    method: 'POST',
+                    body: formData,
+                    signal: controller.signal,
+                });
+                clearTimeout(timeoutId);
+
+                clearInterval(progressInterval);
+
+                const result = await response.json();
+
+                if (result.success) {
+                    updateProgress(100, '✅ Done!');
+                    setTimeout(() => {
+                        document.getElementById('progressSection').classList.remove('active');
+                        document.getElementById('resultSection').classList.add('active');
+                        document.getElementById('resultInfo').textContent = `"${result.title}" — 8 pages, ready to download!`;
+                        document.getElementById('downloadBtn').href = '/download/' + result.filename;
+
+                        // Add to history
+                        addToHistory(result.title, result.filename);
+                    }, 500);
+                } else {
+                    throw new Error(result.error || 'Unknown error');
+                }
+
+            } catch (err) {
+                document.getElementById('progressSection').classList.remove('active');
+                document.getElementById('errorSection').classList.add('active');
+                let msg = err.message;
+                if (err.name === 'AbortError') {
+                    msg = 'Request timed out (2 min). The AI may be overloaded — please try again.';
+                } else if (msg === 'Failed to fetch') {
+                    msg = 'Could not connect to server. Make sure the server is running on http://localhost:5000';
+                }
+                document.getElementById('errorMessage').textContent = msg;
+            }
+
+            document.getElementById('generateBtn').disabled = false;
+        }
+
+        function updateProgress(percent, text) {
+            if (percent !== null) {
+                document.getElementById('progressBar').style.width = percent + '%';
+            }
+            if (text) {
+                document.getElementById('progressStatus').innerHTML = `<span class="step-icon"></span> ${text}`;
+            }
+        }
+
+        // ─── History ───
+        function addToHistory(title, filename) {
+            const list = document.getElementById('historyList');
+            const empty = list.querySelector('.empty-history');
+            if (empty) empty.remove();
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+            const li = document.createElement('li');
+            li.className = 'history-item';
+            li.innerHTML = `
+                <div class="info">
+                    <span>🧶</span>
+                    <div>
+                        <div class="title">${title}</div>
+                        <div class="date">${dateStr}</div>
+                    </div>
+                </div>
+                <a href="/download/${filename}">Download</a>
+            `;
+            list.prepend(li);
+        }
+
+        // ─── Reset ───
+        function resetForm() {
+            document.getElementById('patternTitle').value = '';
+            document.getElementById('progressSection').classList.remove('active');
+            document.getElementById('resultSection').classList.remove('active');
+            document.getElementById('errorSection').classList.remove('active');
+            document.getElementById('generateBtn').disabled = false;
+            document.getElementById('progressBar').style.width = '0%';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
