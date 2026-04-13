@@ -12,7 +12,7 @@ import sys
 import json
 import time
 import uuid
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, redirect
 from werkzeug.utils import secure_filename
 
 # ─── Setup paths ───
@@ -30,11 +30,39 @@ from ai_crochet_pdf import generate_pattern_with_ai, generate_images_for_pattern
 # ─── Flask App ───
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
+app.secret_key = 'crochet-pdf-secret-2026'
+
+# ─── Access Codes (add/remove codes here) ───
+ACCESS_CODES = {
+    "CROCHET2026",
+    "PATTERN100",
+    "YARNLOVE",
+}
 
 
 @app.route('/')
 def index():
+    from flask import session
+    if not session.get('authenticated'):
+        return render_template('login.html')
     return render_template('index.html', saved_key='')
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    from flask import session
+    code = request.form.get('code', '').strip().upper()
+    if code in ACCESS_CODES:
+        session['authenticated'] = True
+        return jsonify({"success": True})
+    return jsonify({"success": False, "error": "Invalid access code"})
+
+
+@app.route('/logout')
+def logout():
+    from flask import session
+    session.pop('authenticated', None)
+    return redirect('/')
 
 
 @app.route('/prompts', methods=['POST'])
