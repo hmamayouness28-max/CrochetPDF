@@ -32,12 +32,21 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
 app.secret_key = 'crochet-pdf-secret-2026'
 
-# ─── Access Codes (add/remove codes here) ───
-ACCESS_CODES = {
-    "CROCHET2026",
-    "PATTERN100",
-    "YARNLOVE",
-}
+# ─── Access Codes (stored in file so they persist) ───
+CODES_FILE = os.path.join(BASE_DIR, "access_codes.json")
+ADMIN_PASSWORD = "admin2026crochet"  # Change this!
+
+def _load_codes():
+    if os.path.exists(CODES_FILE):
+        with open(CODES_FILE, 'r') as f:
+            return set(json.load(f))
+    return {"CROCHET2026", "PATTERN100", "YARNLOVE"}
+
+def _save_codes(codes):
+    with open(CODES_FILE, 'w') as f:
+        json.dump(list(codes), f)
+
+ACCESS_CODES = _load_codes()
 
 
 @app.route('/')
@@ -63,6 +72,53 @@ def logout():
     from flask import session
     session.pop('authenticated', None)
     return redirect('/')
+
+
+@app.route('/admin')
+def admin_page():
+    from flask import session
+    if not session.get('is_admin'):
+        return render_template('admin_login.html')
+    codes = _load_codes()
+    return render_template('admin.html', codes=sorted(codes))
+
+
+@app.route('/admin/login', methods=['POST'])
+def admin_login():
+    from flask import session
+    password = request.form.get('password', '').strip()
+    if password == ADMIN_PASSWORD:
+        session['is_admin'] = True
+        return jsonify({"success": True})
+    return jsonify({"success": False, "error": "Wrong password"})
+
+
+@app.route('/admin/add', methods=['POST'])
+def admin_add_code():
+    from flask import session
+    if not session.get('is_admin'):
+        return jsonify({"success": False, "error": "Not authorized"})
+    code = request.form.get('code', '').strip().upper()
+    if not code:
+        return jsonify({"success": False, "error": "Code is empty"})
+    global ACCESS_CODES
+    ACCESS_CODES = _load_codes()
+    ACCESS_CODES.add(code)
+    _save_codes(ACCESS_CODES)
+    return jsonify({"success": True, "codes": sorted(ACCESS_CODES)})
+
+
+@app.route('/admin/delete', methods=['POST'])
+def admin_delete_code():
+    from flask import session
+    if not session.get('is_admin'):
+        return jsonify({"success": False, "error": "Not authorized"})
+    code = request.form.get('code', '').strip().upper()
+    global ACCESS_CODES
+    ACCESS_CODES = _load_codes()
+    ACCESS_CODES.discard(code)
+    _save_codes(ACCESS_CODES)
+    return jsonify({"success": True, "codes": sorted(ACCESS_CODES)})
 
 
 @app.route('/prompts', methods=['POST'])

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Access Codes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#F0F4F8; min-height:100vh; padding:20px; }
+        .container { max-width:600px; margin:0 auto; }
+        .header { background:linear-gradient(135deg,#E74C3C,#C0392B); padding:24px; border-radius:16px; color:white; text-align:center; margin-bottom:20px; }
+        .header h1 { font-size:1.4rem; }
+        .card { background:white; border-radius:16px; padding:24px; box-shadow:0 4px 20px rgba(0,0,0,0.08); margin-bottom:16px; }
+        h2 { font-size:1.1rem; color:#2C3E50; margin-bottom:16px; }
+        .add-row { display:flex; gap:10px; margin-bottom:20px; }
+        .add-row input { flex:1; padding:12px 16px; font-size:1rem; border:2px solid #E2E8F0; border-radius:12px; outline:none; text-transform:uppercase; letter-spacing:2px; font-weight:600; font-family:'Inter',sans-serif; }
+        .add-row input:focus { border-color:#2E86DE; }
+        .add-btn { padding:12px 24px; background:#27AE60; color:white; border:none; border-radius:12px; font-size:0.9rem; font-weight:700; cursor:pointer; white-space:nowrap; }
+        .add-btn:hover { background:#219A52; }
+        .code-list { list-style:none; }
+        .code-item { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; margin-bottom:8px; }
+        .code-text { font-size:1.1rem; font-weight:700; letter-spacing:3px; color:#2C3E50; }
+        .del-btn { background:#E74C3C; color:white; border:none; padding:6px 16px; border-radius:8px; font-size:0.8rem; font-weight:600; cursor:pointer; }
+        .del-btn:hover { background:#C0392B; }
+        .count { color:#7F8C8D; font-size:0.85rem; margin-bottom:12px; }
+        .back-link { display:inline-block; margin-top:12px; color:#2E86DE; text-decoration:none; font-weight:600; }
+        .empty { text-align:center; color:#BDC3C7; padding:20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Admin Panel - Access Codes</h1>
+        </div>
+
+        <div class="card">
+            <h2>Add New Code</h2>
+            <div class="add-row">
+                <input type="text" id="newCode" placeholder="NEW CODE" maxlength="20" onkeyup="if(event.key==='Enter')addCode()">
+                <button class="add-btn" onclick="addCode()">+ Add</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Active Codes</h2>
+            <p class="count" id="codeCount">{{ codes|length }} codes</p>
+            <ul class="code-list" id="codeList">
+                {% for code in codes %}
+                <li class="code-item">
+                    <span class="code-text">{{ code }}</span>
+                    <button class="del-btn" onclick="deleteCode('{{ code }}')">Delete</button>
+                </li>
+                {% endfor %}
+                {% if not codes %}
+                <li class="empty">No codes yet. Add one above!</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <a href="/" class="back-link">Back to App</a>
+    </div>
+
+    <script>
+    function renderCodes(codes) {
+        const list = document.getElementById('codeList');
+        document.getElementById('codeCount').textContent = codes.length + ' codes';
+        if (codes.length === 0) {
+            list.innerHTML = '<li class="empty">No codes yet. Add one above!</li>';
+            return;
+        }
+        list.innerHTML = codes.map(c => `
+            <li class="code-item">
+                <span class="code-text">${c}</span>
+                <button class="del-btn" onclick="deleteCode('${c}')">Delete</button>
+            </li>
+        `).join('');
+    }
+
+    async function addCode() {
+        const input = document.getElementById('newCode');
+        const code = input.value.trim();
+        if (!code) return;
+        const fd = new FormData();
+        fd.append('code', code);
+        const r = await fetch('/admin/add', { method:'POST', body:fd });
+        const j = await r.json();
+        if (j.success) {
+            renderCodes(j.codes);
+            input.value = '';
+        } else {
+            alert(j.error);
+        }
+    }
+
+    async function deleteCode(code) {
+        if (!confirm('Delete code: ' + code + '?')) return;
+        const fd = new FormData();
+        fd.append('code', code);
+        const r = await fetch('/admin/delete', { method:'POST', body:fd });
+        const j = await r.json();
+        if (j.success) renderCodes(j.codes);
+    }
+    </script>
+</body>
+</html>

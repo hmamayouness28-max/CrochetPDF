@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Crochet PDF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; background:#1A1A2E; }
+        .card { background:white; border-radius:20px; padding:40px; width:100%; max-width:400px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+        h1 { font-size:1.4rem; color:#E74C3C; margin-bottom:24px; }
+        input { width:100%; padding:14px; font-size:1rem; border:2px solid #E2E8F0; border-radius:12px; outline:none; text-align:center; margin-bottom:16px; font-family:'Inter',sans-serif; }
+        input:focus { border-color:#E74C3C; }
+        .btn { width:100%; padding:14px; font-size:1rem; font-weight:700; color:white; border:none; border-radius:12px; cursor:pointer; background:#E74C3C; font-family:'Inter',sans-serif; }
+        .btn:hover { background:#C0392B; }
+        .error { color:#E74C3C; font-size:0.85rem; margin-top:8px; display:none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Admin Panel</h1>
+        <input type="password" id="pwd" placeholder="Admin Password" onkeyup="if(event.key==='Enter')doLogin()">
+        <button class="btn" onclick="doLogin()">Login</button>
+        <p class="error" id="err">Wrong password</p>
+    </div>
+    <script>
+    async function doLogin() {
+        const fd = new FormData();
+        fd.append('password', document.getElementById('pwd').value);
+        const r = await fetch('/admin/login', { method:'POST', body:fd });
+        const j = await r.json();
+        if (j.success) window.location.href = '/admin';
+        else { document.getElementById('err').style.display='block'; setTimeout(()=>document.getElementById('err').style.display='none',2000); }
+    }
+    </script>
+</body>
+</html>
